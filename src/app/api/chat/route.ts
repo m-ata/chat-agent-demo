@@ -13,25 +13,26 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const { messages } = body;
 
-  console.log(messages);
+  // console.log(messages);
   // createEmbeddings()
   const db = await getDataSource();
 
   const response = await openai.chat.completions.create({
-    model: "gpt-4-1106-preview",
+    model: "gpt-4o-mini",
     messages: [
       {
         role: "system",
-        content: "You are a helpful assistant that manages Jira / linear, You ask the user for the required fields, and generate some fields that can be generated.",
+        content: "You are a helpful assistant that manages Jira / linear, You ask the user for the required fields.",
       },
       ...messages,
     ],
-    functions: [createTicketFn(), createSprintFn(), findRelevantIssuesFn()],
+    functions: [createTicketFn(), createSprintFn()],
     function_call: "auto",
   });
 
   const functionCall = response.choices[0].message.function_call;
 
+  console.log({functionCall})
   if (functionCall) {
 
     const args = JSON.parse(functionCall.arguments || "{}");
@@ -39,7 +40,7 @@ export async function POST(req: NextRequest) {
     const result = await handleFunctionCall(functionCall, args)
 
     const followUp = await openai.chat.completions.create({
-      model: "gpt-4-1106-preview",
+      model: "gpt-4o-mini",
       messages: [
         ...messages,
         {

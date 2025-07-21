@@ -1,14 +1,18 @@
+import { createNewSprint } from "../utils/createNewSprint";
+
 export async function createSprint(args: any): Promise<any> {
+  const result = await createNewSprint({
+    name: args.name,
+    goal: args.goal,
+    startDate: args.startDate,
+    endDate: args.endDate,
+    addRelevantIssues: args.addRelevantIssues,
+  })
+  console.log({sprintCreationResult: result})
   return {
-    message: `Created sprint "${args.title}".`,
+    message: `Created sprint "${result?.name}" with ID ${result?.id}.`,
     content: {
-      sprint: {
-        name: args.name,
-        goal: args.goal,
-        startDate: args.startDate,
-        endDate: args.endDate,
-        issues: args.issues,
-      },
+      sprint: result,
     },
   };
 }
@@ -32,30 +36,35 @@ export const createSprintFn = () => {
         startDate: {
           type: "string",
           description:
-            "starting date of the sprint, it should be in this format: 2025-07-24T00:00:00+00:00",
+            `starting date of the sprint, it should be in this format: 2025-07-24T00:00:00+00:00, todays date is: ${new Date()}`,
         },
         endDate: {
           type: "string",
           description:
-            "ending date of the sprint, it should be in this format: 2025-07-24T23:59:59+00:00",
+            `ending date of the sprint, it should be in this format: 2025-07-24T23:59:59+00:00, todays date is: ${new Date()}`,
         },
-        issues: {
-          type: "array",
-          description: "List of issues to be included in the sprint",
-          items: {
-            type: "object",
-            properties: {
-              id: {
-                type: "string",
-                description: "Unique ID of the issue",
-              },
-              title: {
-                type: "string",
-                description: "Title of the issue",
-              },
-            },
-            required: ["id", "title"],
-          },
+        // issues: {
+        //   type: "array",
+        //   description: "List of issues to be included in the sprint, find the relavan issue by using the find_relevant_issues function",
+        //   items: {
+        //     type: "object",
+        //     properties: {
+        //       id: {
+        //         type: "string",
+        //         description: "Unique ID of the issue",
+        //       },
+        //       title: {
+        //         type: "string",
+        //         description: "Title of the issue",
+        //       },
+        //     },
+        //     required: ["id", "title"],
+        //   },
+        // },
+        addRelevantIssues: {
+          type: "boolean",
+          description:
+            "True, If user want to add relevant issues to the sprint, and false, if user want to create the sprint without any issue. Default false.",
         },
         createInLocalOnly: {
           type: "boolean",

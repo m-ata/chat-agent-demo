@@ -1,38 +1,39 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import { Sprint } from "./sprint";
 
-@Entity()
+@Entity({ name: "issue" })
 export class Issue {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ name: "id" })
   id!: number;
 
-  @Column()
+  @Column({ name: "title" })
   title!: string;
 
-  @Column("text")
+  @Column("text", { name: "description" })
   description!: string;
 
-  @Column()
+  @Column({ name: "priority" })
   priority!: string;
 
-  @Column()
+  @Column({ name: "status" })
   status!: string;
 
-  //   @Column({
-  //     type: "vector" as any,
-  //     nullable: false,
-  //   } as any)
-  //   embedding!: number[];
-
   @Column({
+    name: "embedding",
     type: "vector" as any,
     transformer: {
-      to: (value: number[]) => `[${value.join(",")}]`, // ← pgvector format
-      from: (value: string) =>
-        value
-          .replace(/^\[|\]$/g, "") // remove brackets
+      to: (value: number[]) => `[${value.join(",")}]`,
+      from: (value: string | null) => {
+        if (!value) return [];
+        return value
+          .replace(/^\[|\]$/g, "")
           .split(",")
-          .map(parseFloat),
+          .map(parseFloat);
+      }
     },
   } as any)
   embedding!: number[];
+
+  @ManyToOne(() => Sprint, (sprint) => sprint.issues, { nullable: true })
+  sprint!: Sprint | null;
 }

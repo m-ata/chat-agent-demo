@@ -5,7 +5,7 @@ import { findRelevantIssues } from "./findRelevantIssues";
 const toolHandlers: Record<string, (args: any) => Promise<any>> = {
   create_ticket: createTicket,
   create_sprint: createSprint,
-  find_relevant_issues: findRelevantIssues,
+//   find_relevant_issues: findRelevantIssues,
 };
 
 export async function handleFunctionCall(functionCall: { name: string }, args: any) {

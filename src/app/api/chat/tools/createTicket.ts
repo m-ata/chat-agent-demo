@@ -1,16 +1,18 @@
+import { createNewIssue } from "../utils/createNewIssue";
+
 export async function createTicket(args: any): Promise<any> {
+  const result = await createNewIssue({
+    title: args.title,
+    description: args.description,
+    priority: args.priority,
+    status: args.status,
+    sprintId: args.sprintId,
+    createInLocalOnly: true,
+  });
   return {
-    message: `Created ticket "${args.title}" with ID ${"TICKET-123"}.`,
+    message: `Created ticket "${result?.title}" with ID ${result?.id}.`,
     content: {
-      ticket: {
-        id: "TICKET-123",
-        title: args.title,
-        description: args.description,
-        priority: args.priority,
-        status: args.status,
-        sprintId: args.sprintId,
-        createdAt: new Date().toISOString(),
-      },
+      ticket: result,
     },
   };
 }
@@ -41,7 +43,8 @@ export const createTicketFn = () => {
         },
         sprintId: {
           type: "string",
-          description: "Sprint ID if ticket is part of a sprint",
+          description:
+            "Sprint ID if ticket is part of a sprint, sprintId is just an integer like 2, 3, 10",
         },
         createInLocalOnly: {
           type: "boolean",

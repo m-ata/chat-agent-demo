@@ -32,17 +32,6 @@ export default function ChatPage() {
     return data.reply;
   };
 
-  const addIssuesInDB = async () => {
-    const res = await fetch('/api/issue', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({}),
-    });
-  
-    const data = await res.json();
-    return data.reply;
-  };
-
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -51,7 +40,6 @@ export default function ChatPage() {
     <div className="min-h-screen bg-zinc-900 text-white flex flex-col">
       <header className="p-4 border-b border-zinc-700 flex justify-between">
         <h1 className='text-xl font-semibold'>Open AI Agent</h1>
-        <button className='bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg' onClick={addIssuesInDB}>Add Dummy Data In DB</button>
       </header>
 
       <main className="flex-1 overflow-y-auto px-4 py-6 space-y-4">
