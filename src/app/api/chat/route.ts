@@ -6,6 +6,8 @@ import { createEmbeddings } from "./utils/embedding";
 import { getDataSource } from "@/lib/orm";
 import { findRelevantIssues, findRelevantIssuesFn } from "./tools/findRelevantIssues";
 import { handleFunctionCall } from "./tools";
+import { findIssueFn } from "./tools/findIssue";
+import { findSprintFn } from "./tools/findSprint";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -26,7 +28,7 @@ export async function POST(req: NextRequest) {
       },
       ...messages,
     ],
-    functions: [createTicketFn(), createSprintFn()],
+    functions: [createTicketFn(), createSprintFn(), findIssueFn(), findSprintFn()],
     function_call: "auto",
   });
 

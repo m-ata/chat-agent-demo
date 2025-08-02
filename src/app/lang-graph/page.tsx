@@ -1,36 +1,37 @@
 'use client';
 import { Message, UserType } from '@/types/chat';
+import { AIMessage, BaseMessage, HumanMessage } from '@langchain/core/messages';
 import { useState, useRef, useEffect } from 'react';
 
 export default function ChatPage() {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<BaseMessage[]>([]);
   const [input, setInput] = useState('');
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
 
-    const userMessage = { role: UserType.USER, content: input };
-    const newMessagesArray = [...messages, userMessage]
+    const userMessage = new HumanMessage(input);
+    const newMessagesArray = [...messages, userMessage];
     setMessages(newMessagesArray);
-
     setInput('');
 
-    // Simulate bot response or send to API here
     const botReply = await getBotReply(newMessagesArray);
-    setMessages((prev) => [...prev, { role: UserType.BOT, content: botReply }]);
+    setMessages((prev) => [...prev, botReply]);
   };
 
-  const getBotReply = async (newMessagesArray: any[]) => {
-    const res = await fetch('/api/chat', {
+  const getBotReply = async (messagesArray: BaseMessage[]) => {
+    const serialized = messagesArray.map((msg) => msg.toDict());
+
+    const res = await fetch('/api/lang-graph', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: newMessagesArray }),
+      body: JSON.stringify({ messages: serialized }),
     });
-  
+
     const data = await res.json();
-    return data.reply;
-  };
+    return new AIMessage(data.reply);
+  }
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -47,10 +48,10 @@ export default function ChatPage() {
           <div
             key={i}
             className={`max-w-xl px-4 py-2 rounded-lg ${
-              msg.role === UserType.USER ? 'bg-blue-600 ml-auto' : 'bg-zinc-800'
+              msg.getType() === 'human' ? 'bg-blue-600 ml-auto' : 'bg-zinc-800'
             }`}
           >
-            {msg.content}
+            {msg.content as string}
           </div>
         ))}
         <div ref={bottomRef} />
